@@ -1,0 +1,95 @@
+
+        //reset
+        public void reset1()
+        {
+            name.Text = "";
+            age.Text = "";
+            address.Text = "";
+            cmb.SelectedIndex = -1;
+            sub.Text = "";
+        }
+        //data show in grid view
+        
+        private void populate()
+        {
+            con.Open();
+            string Query = "select * from fill";
+            SqlDataAdapter sda = new SqlDataAdapter(Query, con);
+            var ds = new DataSet();
+            sda.Fill(ds);
+            dgv.DataSource = ds.Tables[0];
+            con.Close();
+        }
+        SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=F:\C#\WPF\WindowsFormsApp1\WindowsFormsApp1\Curd.mdf;Integrated Security=True");
+        private void reset_Click(object sender, EventArgs e)
+        {
+            reset1();
+        }
+        //Insert Code
+        private void add_Click(object sender, EventArgs e)
+        {
+            string query = "Insert into fill values('" + name.Text + "', '" + age.Text + "', '" + address.Text + "', '" + cmb.SelectedItem.ToString() + "', '" + sub.Text + "')";
+            con.Open();
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.ExecuteNonQuery();
+            MessageBox.Show("Insert");
+            con.Close();
+            reset1();
+            populate();
+        }
+
+
+
+        //view data
+        private void view_Click(object sender, EventArgs e)
+        {
+            populate();
+        }
+
+        //update
+        private void update_Click(object sender, EventArgs e)
+        {
+            string query = "Update fill set name='" + name.Text + "',age='" + age.Text + "',gender='" + cmb.SelectedItem.ToString() + "',address='" + address.Text + "', subject='" + sub.Text + "' where id=" + key + ";";
+            con.Open();
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.ExecuteNonQuery();
+            MessageBox.Show("update");
+            con.Close();
+            reset1();
+            populate();
+        }
+
+        //selected data in form
+        //gridview -> events -> cellclick
+
+        int key = 0;
+        private void dgv_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridViewRow dgvRow = dgv.Rows[e.RowIndex];
+
+            name.Text = dgvRow.Cells[1].Value.ToString();
+            age.Text = dgvRow.Cells[2].Value.ToString();
+            address.Text = dgvRow.Cells[3].Value.ToString();
+            cmb.SelectedItem = dgvRow.Cells[4].Value.ToString();
+            sub.Text = dgvRow.Cells[5].Value.ToString();
+            if (name.Text == "")
+            {
+                key = 0;
+            }
+            else
+            {
+                key = Convert.ToInt32(dgvRow.Cells[0].Value.ToString());
+            }
+        }
+
+        private void delete_Click(object sender, EventArgs e)
+        {
+            string query = "Delete from fill where id=" + key + "";
+            con.Open();
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.ExecuteNonQuery();
+            MessageBox.Show("Delete");
+            con.Close();
+            reset1();
+            populate();
+        }
